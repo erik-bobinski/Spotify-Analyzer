@@ -51,6 +51,4 @@ def export_playlists_to_csv():
                     'Track ID': track_id
                 })
 
-    print("Data exported to spotify_playlists.csv")
-
 export_playlists_to_csv()
