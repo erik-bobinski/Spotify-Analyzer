@@ -36,4 +36,21 @@ class Recommender:
         
         return similarity
     
+    def recommend(self, targetID, top=5):
+        '''
+        Recommends songs similar to the target based on similarity scores.
+        params: targetID(str): ID of target song, top(int): number of recommendations to return
+        returns: pd.DataFrame = top n recommended songs with details and similarity scores
+        '''
+        
+        # calculate similarity scores
+        sim_scores = self.cosineSimilarity(targetID)
+        
+        # add similarity scores to dataset
+        self.data['similarity'] = sim_scores
+        
+        # sort by similarity, excluding target
+        recs = (self.data[self.data['id'] != targetID].sort_values(by='similarity', ascending=False).head(top))
+        
+        return recs[['name', 'artists', 'similarity']]
     
