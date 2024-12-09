@@ -1,11 +1,17 @@
-from dash import Dash, html, dcc
+from dash import Dash, html, dcc, callback, Input, Output
+import dash
 
 # initialize the app
-app = Dash(__name__)
+app = Dash(__name__, suppress_callback_exceptions=True)
 
-# parent div
+# layout for the login page
 app.layout = html.Div([
-    # title text
+    dcc.Location(id='url', refresh=True),  # This enables page navigation
+    html.Div(id='page-content')
+])
+
+# login page layout
+login_layout = html.Div([
     html.H1("Spotify Analyzer",
     style={
         'textAlign': 'center',
@@ -26,7 +32,7 @@ app.layout = html.Div([
             'width': '300px',
             'padding': '10px',
             'borderRadius': '5px',
-            'border': '1px solid #1DB954',  # spotify green
+            'border': '1px solid #1DB954',
             'backgroundColor': '#282828',
             'color': 'white'
         }
@@ -59,7 +65,7 @@ app.layout = html.Div([
         'alignItems': 'center',
         'padding': '40px'
     }),
-    # submit Button
+    # submit btn with Navigation
     html.Div([
     html.Button('Submit', 
         id='submit-val', 
@@ -75,19 +81,64 @@ app.layout = html.Div([
             'cursor': 'pointer',
             'transition': 'background-color 0.3s ease',
             'boxShadow': '0 4px 6px rgba(0,0,0,0.1)'
-        },
+        }
     )
     ], style={
         'display': 'flex',
         'justifyContent': 'center',
         'alignItems': 'center',
     })
-], style={ # parent div styling
+], style={
     'backgroundColor': '#1e1e1e',
     'height': '100vh',
-    'padding': '20px',
+    'padding': '20px'
 })
 
-# Run the app
+# dashboard page layout
+dashboard_layout = html.Div([
+    html.H1("Spotify Analyzer Dashboard", 
+        style={
+            'textAlign': 'center',
+            'color': 'white',
+            'backgroundColor': '#1e1e1e',
+            'padding': '20px'
+        }
+    )
+], style={
+    'backgroundColor': '#1e1e1e',
+    'height': '100vh',
+    'color': 'white'
+})
+
+# callback to handle page navigation
+@callback(
+    Output('url', 'pathname'),
+    Input('submit-val', 'n_clicks'),
+    prevent_initial_call=True
+)
+def navigate_to_dashboard(n_clicks):
+    if n_clicks > 0:
+        return '/dashboard'  # URL path for db page
+
+# update page content based on URL
+@callback(
+    Output('page-content', 'children'),
+    Input('url', 'pathname')
+)
+def display_page(pathname):
+    if pathname == '/':
+        return login_layout
+    elif pathname == '/dashboard':
+        return dashboard_layout
+    else:
+        return '404 Page Not Found'
+
+# set the initial layout
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=True),
+    html.Div(id='page-content')
+])
+
+# run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
