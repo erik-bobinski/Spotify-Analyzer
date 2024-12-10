@@ -93,6 +93,7 @@ Spotify Analyzer is a Python-based tool that recommends songs similar to a given
 - Pandas: For data manipulation and analysis.
 - Numpy: For numerical operations.
 - Pytest: For testing the functionality.
+- Sklearn: For K-Means algorithm.
 
 ## getSpotify.py
 
