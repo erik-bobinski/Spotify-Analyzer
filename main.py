@@ -4,6 +4,7 @@
 
 from DataProcessor import DataProcessor
 from Recommender import Recommender
+from uiLogin import uiLogin
 
 def main():
     processor = DataProcessor("data.csv")
@@ -12,6 +13,8 @@ def main():
     pp_data = processor.preprocessData()
     
     recommender = Recommender(pp_data)
+
+    uiLogin(recommender).run_server(debug=True)
     
     # this point on is for basic testing. comment out once GUI is integrated.
     
