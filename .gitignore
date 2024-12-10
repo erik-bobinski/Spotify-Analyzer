@@ -2,4 +2,3 @@ spotify_playlists.csv
 __pycache__
 .DS_Store
 .pytest_cache
-data.csv
