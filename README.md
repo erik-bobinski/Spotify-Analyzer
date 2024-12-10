@@ -66,9 +66,10 @@ Spotify Analyzer is a Python-based tool that recommends songs similar to a given
 ### Dashboard
 
 1. Login to the webapp via the GUI.
-2. Select a target song from the dropdown menu.
-3. Click the "Recommend" button to generate a list of similar tracks.
-4. View the recommendations dynamically in the dashboard.
+2. Enter at least 3 characters in the inital seach bar and press enter to see dropdown menu.
+3. Select a target song from the dropdown menu.
+4. Click the "Recommend" button to generate a list of similar tracks.
+5. View the recommendations dynamically in the dashboard.
 
 ---
 
