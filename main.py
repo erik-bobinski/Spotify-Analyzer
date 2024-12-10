@@ -14,16 +14,16 @@ def main():
     
     recommender = Recommender(pp_data)
 
-    uiLogin(recommender).run_server(debug=True)
+    uiLogin(recommender, pp_data).run_server(debug=False)
     
     # this point on is for basic testing. comment out once GUI is integrated.
     
-    user_targetID = input("What is your favorite song ID? : ")
+    # user_targetID = input("What is your favorite song ID? : ")
     
-    recs = recommender.recommend(user_targetID, top=5)
+    # recs = recommender.recommend(user_targetID, top=5)
     
-    print("Top 5 Recommendations: ")
-    print(recs)
+    # print("Top 5 Recommendations: ")
+    # print(recs)
     
 
 if __name__ == "__main__":

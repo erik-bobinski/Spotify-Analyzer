@@ -1,9 +1,6 @@
 from dash import Dash, html, dcc, callback, Input, Output, State
-import pandas as pd
-from Recommender import Recommender
-from DataProcessor import DataProcessor
 
-def uiLogin(reccomender):
+def uiLogin(recommender, df):
 
     # Initialize the app
     app = Dash(__name__, suppress_callback_exceptions=True)
@@ -55,6 +52,7 @@ def uiLogin(reccomender):
                 type='text',
                 placeholder='Type to search for a song...',
                 debounce=True,
+                minLength=3,
                 style={'width': '50%', 'padding': '10px', 'borderRadius': '5px', 'backgroundColor': '#282828', 'color': 'white'}
             ),
             html.Div(id='song-search-output', style={'color': 'white', 'paddingTop': '10px'})
@@ -110,11 +108,13 @@ def uiLogin(reccomender):
         Input('song-search-input', 'value')
     )
     def update_song_options(search_value):
-        if not search_value:
-            return "Start typing to search for a song..."
+        if len(search_value) < 3:
+            return "Please enter at least 3 characters."
+        
         filtered_df = df[df['name'].str.contains(search_value, case=False, na=False)]
         if filtered_df.empty:
             return "No matching songs found."
+        
         return html.Div([
             dcc.Dropdown(
                 id='song-dropdown',

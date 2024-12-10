@@ -44,7 +44,7 @@ Spotify Analyzer is a Python-based tool that recommends songs similar to a given
 3. Run the application:
 
    ```bash
-   python uiLogin.py
+   python main.py
    ```
 
 4. Run the test suite (optional):
@@ -64,11 +64,10 @@ Spotify Analyzer is a Python-based tool that recommends songs similar to a given
 
 ### Dashboard
 
-1. Upload your Spotify dataset (CSV format) via the GUI.
+1. Login to the webapp via the GUI.
 2. Select a target song from the dropdown menu.
 3. Click the "Recommend" button to generate a list of similar tracks.
 4. View the recommendations dynamically in the dashboard.
-5. Export the recommendations to a CSV file.
 
 ---
 
@@ -82,8 +81,10 @@ Spotify Analyzer is a Python-based tool that recommends songs similar to a given
   - Contains the cosine similarity logic and recommendation generation.
 - **`uiLogin.py`**:
   - Implements the GUI using Dash.
-- **`test_DataProcessor.py` & `test_Recommender.py`**:
+- **`test_app.py`**:
   - Contains pytest cases to validate data processing and recommendation logic.
+- **`main.py`**:
+  - Brings everything together and runs the code.
 
 ### Dependencies
 
