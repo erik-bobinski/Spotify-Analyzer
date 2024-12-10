@@ -1,12 +1,15 @@
 from dash import Dash, html, dcc, callback, Input, Output, State
 import pandas as pd
 from Recommender import Recommender
+from DataProcessor import DataProcessor
 
 # Initialize the app
 app = Dash(__name__, suppress_callback_exceptions=True)
 
-# Load  dataset
-df = pd.read_csv('data.csv')
+# Initialize the DataProcessor
+data_processor = DataProcessor('data.csv')
+df = data_processor.loadData()  # Load the dataset
+df = data_processor.preprocessData()  # Preprocess the data
 recommender = Recommender(df)
 
 # Login page layout
@@ -69,7 +72,7 @@ dashboard_layout = html.Div([
                 {'label': 'Danceability', 'value': 'danceability'},
                 {'label': 'Energy', 'value': 'energy'},
                 {'label': 'Tempo', 'value': 'tempo'},
-                {'label': 'Acousticness', 'value': 'acousticness'}
+                {'label': 'Acoustics', 'value': 'acoustics'}
             ],
             value=['valence', 'danceability', 'energy'],
             inline=True,
@@ -127,7 +130,6 @@ def update_song_options(search_value):
         )
     ])
 
-# Get Recommendations
 @callback(
     Output('recommendations-output', 'children'),
     Input('recommend-button', 'n_clicks'),
@@ -138,9 +140,18 @@ def update_song_options(search_value):
 def get_recommendations(n_clicks, song_id, parameters):
     if not song_id or not parameters:
         return "Please select a song and parameters for recommendations."
-    recommender.data = df[parameters + ['id', 'name', 'artists']]
+    
+    # Ensure the parameters exist in the data
+    available_columns = df.columns.tolist()
+    missing_columns = [param for param in parameters if param not in available_columns]
+    
+    if missing_columns:
+        return f"The following parameters are missing from the data: {', '.join(missing_columns)}"
+    
+    recommender.data = df[parameters + ['id', 'name', 'artists']]  # Pass the selected parameters
     recommendations = recommender.recommend(song_id)
     return html.Ul([html.Li(f"{rec['name']} by {rec['artists']}") for rec in recommendations.to_dict('records')])
+
 
 # App Layout
 app.layout = html.Div([
