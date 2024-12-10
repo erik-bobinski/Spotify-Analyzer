@@ -1,0 +1,4 @@
+dash==2.18.2
+numpy==2.2.0
+pandas==2.2.3
+pytest==8.3.3
