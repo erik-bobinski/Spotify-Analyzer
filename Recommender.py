@@ -48,7 +48,7 @@ class Recommender:
         params: targetID(str): ID of target song, top(int): number of recommendations to return, features(): features to consider
         returns: pd.DataFrame = top n recommended songs with details and similarity scores
         '''
-        
+    
         # if user wants to prioritize recs in same cluster as target
         if cluster_priority and 'cluster' in self.data.columns:
             target_cluster = self.data.loc[self.data['id'] == targetID, 'cluster'].values[0]     # cluster of target song 
@@ -56,14 +56,12 @@ class Recommender:
             
         else:
             cluster_songs = self.data.copy() # use entire dataset
-            
         
         cluster_songs = cluster_songs[cluster_songs['id'] != targetID] # exclude target song
         
         # calculate similarity scores
         cluster_features = cluster_songs[features].values
         target_features = self.data.loc[self.data['id'] == targetID, features].values[0]
-        
         
         # cosine similarity for the filtered dataset
         dot_product = np.dot(cluster_features, target_features)
@@ -96,10 +94,14 @@ class Recommender:
             global_recs = global_songs.sort_values(by='similarity', ascending=False).head(remaining)
             recs = pd.concat([recs, global_recs])
 
-        
-        
         # add percent sign to similarity
         recs['similarity'] = recs['similarity'].apply(lambda x: f"{x:.2f}%")
         recs = recs.head(top)
 
-        return recs[['name', 'artists', 'similarity', 'cluster']]
+        # Conditionally include 'cluster' in the result if it exists
+        columns_to_return = ['name', 'artists', 'similarity']
+        if 'cluster' in recs.columns:
+            columns_to_return.append('cluster')
+
+        return recs[columns_to_return]
+

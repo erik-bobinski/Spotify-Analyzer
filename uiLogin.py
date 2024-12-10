@@ -126,12 +126,13 @@ def uiLogin(recommender, df):
             )
         ])
 
+    # Get and display recommendations when btn is pressed
     @callback(
-        Output('recommendations-output', 'children'),
-        Input('recommend-button', 'n_clicks'),
-        State('song-dropdown', 'value'),
-        State('recommendation-parameters', 'value'),
-        prevent_initial_call=True
+        Output('recommendations-output', 'children'), # display recommendations
+        Input('recommend-button', 'n_clicks'), # trigger on btn press
+        State('song-dropdown', 'value'), # update on song select
+        State('recommendation-parameters', 'value'), # update on features select
+        prevent_initial_call=True # prevent callback before user interaction
     )
     def get_recommendations(n_clicks, song_id, parameters):
         if not song_id or not parameters:
@@ -145,7 +146,9 @@ def uiLogin(recommender, df):
             return f"The following parameters are missing from the data: {', '.join(missing_columns)}"
         
         recommender.data = df[parameters + ['id', 'name', 'artists']]  # Pass the selected parameters
-        recommendations = recommender.recommend(song_id)
+        recommendations = recommender.recommend(song_id, parameters)
+
+        # Formatted ecommendations as HTML list
         return html.Ul([html.Li(f"{rec['name']} by {rec['artists']}") for rec in recommendations.to_dict('records')])
 
 
