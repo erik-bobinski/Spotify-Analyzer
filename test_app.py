@@ -12,7 +12,7 @@ InputData = pd.DataFrame({
     'danceability': [0.8, 0.9, 0.7],
     'energy': [0.6, 0.85, 0.75],
     'tempo': [120.0, 130.0, 140.0],
-    'acoustics': [0.2, 0.3, 0.4]
+    'acousticness': [0.2, 0.3, 0.4]
 })
 
 def test_load_data(tmp_path):
@@ -27,18 +27,27 @@ def test_load_data(tmp_path):
 def test_cosine_similarity():
     """Test cosine similarity calculation."""
     recommender = Recommender(InputData)
-    Similarities = recommender.cosineSimilarity('1')
+    features = ['valence', 'danceability', 'energy', 'tempo', 'acousticness']
+    Similarities = recommender.cosineSimilarity('1', features)
     assert len(Similarities) == len(InputData), "Similarity scores should match the number of songs."
-    assert np.isclose(Similarities[0], 1, atol=1e-6), "Target song should have a similarity of 1 with itself."
+    assert np.isclose(Similarities[0], 100, atol=1e-6), "Target song should have a similarity of 1 with itself."
 
 def test_recommend():
     """Test song Recommendations."""
-    recommender = Recommender(InputData)
-    Recommendations = recommender.recommend('1', top=2)
-    assert len(Recommendations) == 2, "Number of Recommendations should match the 'top' parameter."
-    assert 'name' in Recommendations.columns, "Recommendations should include song names."
-    assert 'similarity' in Recommendations.columns, "Recommendations should include similarity scores."
+    processor = DataProcessor(None)
+    processor.data = InputData.copy()
+    clustered_data = processor.clusterData(n_clusters=2)  # Apply clustering
+    recommender = Recommender(clustered_data)
 
+    features = ['valence', 'danceability', 'energy', 'tempo', 'acousticness']
+
+    recommendations = recommender.recommend('1', features=features, top=2, cluster_priority=True)
+    assert len(recommendations) == 2, "Number of recommendations should match the 'top' parameter."
+    assert 'name' in recommendations.columns, "Recommendations should include song names."
+    assert 'similarity' in recommendations.columns, "Recommendations should include similarity scores."
+    assert 'cluster' in clustered_data.columns, "Cluster column should exist in the dataset."
+    
+    
 def test_data_integrity():
     """Test that data integrity is preserved after processing."""
     processor = DataProcessor(None)
@@ -49,5 +58,14 @@ def test_data_integrity():
 def test_invalid_song_id():
     """Test behavior with an invalid song ID."""
     recommender = Recommender(InputData)
+    features = ['valence', 'danceability', 'energy', 'tempo', 'acousticness']
     with pytest.raises(IndexError):
-        recommender.recommend('invalid_id', top=5)
+        recommender.recommend('invalid_id', features=features, top=5, cluster_priority=True)
+
+def test_clustering():
+    processor = DataProcessor(None)
+    processor.data = InputData.copy()
+    clustered_data = processor.clusterData(n_clusters=2)
+    assert 'cluster' in clustered_data.columns, "Cluster labels should be added to the dataset."
+    assert clustered_data['cluster'].nunique() == 2, "There should be exactly 2 clusters."
+
