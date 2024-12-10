@@ -2,7 +2,7 @@
 
 ## **Project Description**
 
-Spotify Analyzer is a Python-based tool that recommends songs similar to a given track using cosine similarity. Users can upload their Spotify data, explore recommendations, and interact with the system through an intuitive GUI. The application leverages `pandas` and `numpy` for data processing and Dash for a graphical user interface.
+Spotify Analyzer is a Python-based tool that recommends songs similar to a given track using cosine similarity and K-Means Clustering, an unsupervised machine learning algorithm. Users can upload their Spotify data, explore recommendations, and interact with the system through an intuitive GUI. The application leverages `pandas` and `numpy` for data processing and Dash for a graphical user interface.
 
 ---
 
@@ -10,12 +10,13 @@ Spotify Analyzer is a Python-based tool that recommends songs similar to a given
 
 - Login and Dashboard for a seamless user experience.
 - Song recommendation system based on cosine similarity.
+- Optimization using K-Means Clustering of songs. 
 - Data preprocessing with normalization of key features (e.g., valence, energy, tempo).
 - Dynamic, interactive GUI with:
   - Dropdowns for song selection.
   - Buttons to process data and generate recommendations.
   - Graphical display of song recommendations.
-- Advanced Python module integration (`pandas`, `numpy`).
+- Advanced Python module integration (`pandas`, `numpy`, `sklearn`).
 
 ---
 
