@@ -1,126 +1,99 @@
-from dash import Dash, html, dcc, callback, Input, Output
-import dash
+from dash import Dash, html, dcc, callback, Input, Output, State
+import pandas as pd
+from Recommender import Recommender
 
-# initialize the app
+# Initialize the app
 app = Dash(__name__, suppress_callback_exceptions=True)
 
-# layout for the login page
-app.layout = html.Div([
-    dcc.Location(id='url', refresh=True),  # This enables page navigation
-    html.Div(id='page-content')
-])
+# Load  dataset
+df = pd.read_csv('data.csv')
+recommender = Recommender(df)
 
-# login page layout
+# Login page layout
 login_layout = html.Div([
     html.H1("Spotify Analyzer",
-    style={
-        'textAlign': 'center',
-        'color': 'white',
-        'marginTop': '20px',
-        'marginBottom': '30px',
-        'padding': '20px'
-    }
-    ),
-    # email textbox
+            style={
+                'textAlign': 'center',
+                'color': 'white',
+                'marginTop': '20px',
+                'marginBottom': '30px',
+                'padding': '20px'
+            }),
+    # Email and Password Inputs
     html.Div([
-    html.Label("Email:", style={'color': 'white'}),
-    dcc.Input(
-        id='email-div',
-        type='text',
-        placeholder='Enter your email',
-        style={
-            'width': '300px',
-            'padding': '10px',
-            'borderRadius': '5px',
-            'border': '1px solid #1DB954',
-            'backgroundColor': '#282828',
-            'color': 'white'
-        }
-    )
-    ], style={
-        'display': 'flex',
-        'justifyContent': 'center',
-        'alignItems': 'center',
-        'padding': '40px'
-    }),
-    # password textbox
+        html.Label("Email:", style={'color': 'white'}),
+        dcc.Input(
+            id='email-div',
+            type='text',
+            placeholder='Enter your email',
+            style={'width': '300px', 'padding': '10px', 'borderRadius': '5px', 'backgroundColor': '#282828', 'color': 'white'}
+        )
+    ], style={'textAlign': 'center', 'padding': '10px'}),
     html.Div([
-    html.Label("Password:", style={'color': 'white'}),
-    dcc.Input(
-        id='password-div',
-        type='password',
-        placeholder='Enter your password',
-        style={
-            'width': '300px',
-            'padding': '10px',
-            'borderRadius': '5px',
-            'border': '1px solid #1DB954',
-            'backgroundColor': '#282828',
-            'color': 'white'
-        }
-    )
-    ], style={
-        'display': 'flex',
-        'justifyContent': 'center',
-        'alignItems': 'center',
-        'padding': '40px'
-    }),
-    # submit btn with Navigation
+        html.Label("Password:", style={'color': 'white'}),
+        dcc.Input(
+            id='password-div',
+            type='password',
+            placeholder='Enter your password',
+            style={'width': '300px', 'padding': '10px', 'borderRadius': '5px', 'backgroundColor': '#282828', 'color': 'white'}
+        )
+    ], style={'textAlign': 'center', 'padding': '10px'}),
+    # Submit Button
     html.Div([
-    html.Button('Submit', 
-        id='submit-val', 
-        n_clicks=0,
-        style={
-            'backgroundColor': '#1DB954',
-            'color': 'white',
-            'border': 'none',
-            'padding': '12px 24px',
-            'borderRadius': '25px',
-            'fontSize': '16px',
-            'fontWeight': 'bold',
-            'cursor': 'pointer',
-            'transition': 'background-color 0.3s ease',
-            'boxShadow': '0 4px 6px rgba(0,0,0,0.1)'
-        }
-    )
-    ], style={
-        'display': 'flex',
-        'justifyContent': 'center',
-        'alignItems': 'center',
-    })
-], style={
-    'backgroundColor': '#1e1e1e',
-    'height': '100vh',
-    'padding': '20px'
-})
+        html.Button('Submit', id='submit-val', n_clicks=0,
+                    style={'backgroundColor': '#1DB954', 'color': 'white', 'border': 'none', 'padding': '10px 20px', 'borderRadius': '5px'})
+    ], style={'textAlign': 'center', 'padding': '10px'})
+], style={'backgroundColor': '#1e1e1e', 'height': '100vh', 'padding': '20px'})
 
-# dashboard page layout
+# Dashboard layout
 dashboard_layout = html.Div([
-    html.H1("Spotify Analyzer Dashboard", 
-        style={
-            'textAlign': 'center',
-            'color': 'white',
-            'backgroundColor': '#1e1e1e',
-            'padding': '20px'
-        }
-    )
-], style={
-    'backgroundColor': '#1e1e1e',
-    'height': '100vh',
-    'color': 'white'
-})
+    html.H1("Spotify Analyzer Dashboard",
+            style={'textAlign': 'center', 'color': 'white', 'backgroundColor': '#1e1e1e', 'padding': '20px'}),
+    html.Div([
+        html.Label("Search for a Song:", style={'color': 'white'}),
+        dcc.Input(
+            id='song-search-input',
+            type='text',
+            placeholder='Type to search for a song...',
+            debounce=True,
+            style={'width': '50%', 'padding': '10px', 'borderRadius': '5px', 'backgroundColor': '#282828', 'color': 'white'}
+        ),
+        html.Div(id='song-search-output', style={'color': 'white', 'paddingTop': '10px'})
+    ], style={'padding': '20px'}),
+    html.Div([
+        html.Label("Recommendation Parameters:", style={'color': 'white'}),
+        dcc.Checklist(
+            id='recommendation-parameters',
+            options=[
+                {'label': 'Valence', 'value': 'valence'},
+                {'label': 'Danceability', 'value': 'danceability'},
+                {'label': 'Energy', 'value': 'energy'},
+                {'label': 'Tempo', 'value': 'tempo'},
+                {'label': 'Acousticness', 'value': 'acousticness'}
+            ],
+            value=['valence', 'danceability', 'energy'],
+            inline=True,
+            style={'color': 'white'}
+        )
+    ], style={'padding': '20px'}),
+    html.Div([
+        html.Button("Get Recommendations",
+                    id='recommend-button',
+                    n_clicks=0,
+                    style={'backgroundColor': '#1DB954', 'color': 'white', 'padding': '10px 20px', 'borderRadius': '5px'})
+    ], style={'padding': '20px'}),
+    html.Div(id='recommendations-output', style={'color': 'white', 'paddingTop': '20px'})
+], style={'backgroundColor': '#1e1e1e', 'height': '100vh'})
 
-# callback to handle page navigation
+# Callbacks for Navigation
 @callback(
     Output('url', 'pathname'),
     Input('submit-val', 'n_clicks'),
     prevent_initial_call=True
 )
 def navigate_to_dashboard(n_clicks):
-    if n_clicks > 0:
-        return '/dashboard'  # URL path for db page
+    return '/dashboard' if n_clicks > 0 else '/'
 
-# update page content based on URL
 @callback(
     Output('page-content', 'children'),
     Input('url', 'pathname')
@@ -130,15 +103,51 @@ def display_page(pathname):
         return login_layout
     elif pathname == '/dashboard':
         return dashboard_layout
-    else:
-        return '404 Page Not Found'
+    return '404 Page Not Found'
 
-# set the initial layout
+# Dynamic Dropdown Search for Songs
+@callback(
+    Output('song-search-output', 'children'),
+    Input('song-search-input', 'value')
+)
+def update_song_options(search_value):
+    if not search_value:
+        return "Start typing to search for a song..."
+    filtered_df = df[df['name'].str.contains(search_value, case=False, na=False)]
+    if filtered_df.empty:
+        return "No matching songs found."
+    return html.Div([
+        dcc.Dropdown(
+            id='song-dropdown',
+            options=[
+                {'label': name, 'value': song_id} for name, song_id in zip(filtered_df['name'], filtered_df['id'])
+            ],
+            placeholder='Select a song...',
+            style={'width': '100%', 'color': 'black'}
+        )
+    ])
+
+# Get Recommendations
+@callback(
+    Output('recommendations-output', 'children'),
+    Input('recommend-button', 'n_clicks'),
+    State('song-dropdown', 'value'),
+    State('recommendation-parameters', 'value'),
+    prevent_initial_call=True
+)
+def get_recommendations(n_clicks, song_id, parameters):
+    if not song_id or not parameters:
+        return "Please select a song and parameters for recommendations."
+    recommender.data = df[parameters + ['id', 'name', 'artists']]
+    recommendations = recommender.recommend(song_id)
+    return html.Ul([html.Li(f"{rec['name']} by {rec['artists']}") for rec in recommendations.to_dict('records')])
+
+# App Layout
 app.layout = html.Div([
     dcc.Location(id='url', refresh=True),
     html.Div(id='page-content')
 ])
 
-# run the app
+# Run App
 if __name__ == '__main__':
     app.run_server(debug=True)
