@@ -1,6 +1,6 @@
 # Author: Ryan Connolly
 # Date: December 10, 2024
-# Description: This module manages the recommendation logic using cosine similarity.
+# Description: This module defines the Recommender class that manages the recommendation logic using cosine similarity.
 
 import numpy as np 
 
@@ -20,7 +20,7 @@ class Recommender:
         '''
         
         # features to consider
-        features = ['valence', 'danceability', 'energy', 'tempo', 'acoustics']
+        features = ['valence', 'danceability', 'energy', 'tempo', 'acousticness']
         
         # extract features of target
         target_features = self.data.loc[self.data['id'] == targetID, features].values[0]
@@ -34,7 +34,9 @@ class Recommender:
         norm_all = np.linalg.norm(total_features, axis=1)  # magnitudes of all features
         similarity = dot_product / (norm_all * norm_target)  # cosine similarity formula
         
-        return similarity
+        sim_perc = similarity * 100  # convert similarity to percentage for better user understanding
+        
+        return sim_perc
     
     def recommend(self, targetID, top=5):
         '''
@@ -52,5 +54,7 @@ class Recommender:
         # sort by similarity, excluding target
         recs = (self.data[self.data['id'] != targetID].sort_values(by='similarity', ascending=False).head(top))
         
+        # add percent sign to similarity
+        recs['similarity'] = recs['similarity'].apply(lambda x: f"{x:.2f}%")
+        
         return recs[['name', 'artists', 'similarity']]
-    
