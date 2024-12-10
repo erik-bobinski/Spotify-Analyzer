@@ -15,7 +15,6 @@ Spotify Analyzer is a Python-based tool that recommends songs similar to a given
   - Dropdowns for song selection.
   - Buttons to process data and generate recommendations.
   - Graphical display of song recommendations.
-  - Export of recommendations to a CSV file.
 - Advanced Python module integration (`pandas`, `numpy`).
 
 ---
