@@ -11,16 +11,20 @@ def main():
     data = processor.loadData()
     clean = processor.clean()
     pp_data = processor.preprocessData()
+    clustered = processor.clusterData(n_clusters=10)
     
-    recommender = Recommender(pp_data)
-
-    uiLogin(recommender, pp_data).run_server(debug=False)
+    recommender = Recommender(clustered)
+    
+    app = uiLogin(recommender, clustered)
+    app.run_server(debug=False)
     
     # this point on is for basic testing. comment out once GUI is integrated.
     
-    # user_targetID = input("What is your favorite song ID? : ")
+    # user_targetID = input("Enter target song ID : ")
     
-    # recs = recommender.recommend(user_targetID, top=5)
+    # features = ['valence', 'danceability', 'energy', 'tempo', 'acousticness']  # default
+    # top = 5
+    # recs = recommender.recommend(user_targetID, features, top=top, cluster_priority=True)
     
     # print("Top 5 Recommendations: ")
     # print(recs)
