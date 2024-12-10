@@ -72,7 +72,7 @@ dashboard_layout = html.Div([
                 {'label': 'Danceability', 'value': 'danceability'},
                 {'label': 'Energy', 'value': 'energy'},
                 {'label': 'Tempo', 'value': 'tempo'},
-                {'label': 'Acoustics', 'value': 'acoustics'}
+                {'label': 'Acousticness', 'value': 'acousticness'}
             ],
             value=['valence', 'danceability', 'energy'],
             inline=True,
